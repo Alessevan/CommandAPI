@@ -280,7 +280,8 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         return new ArrayList<>();
     }
 
-    public void registerRunners(final Class<? extends CommandRunner>... executors) {
+    @SafeVarargs
+    public final void registerRunners(final Class<? extends CommandRunner>... executors) {
 
         executors:
         for (final Class<? extends CommandRunner> executor : executors) {
@@ -353,7 +354,8 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 
     }
 
-    public void unregisterRunners(final Class<? extends CommandRunner>... executors) {
+    @SafeVarargs
+    public final void unregisterRunners(final Class<? extends CommandRunner>... executors) {
 
         for (final Class<? extends CommandRunner> executor : executors) {
 
