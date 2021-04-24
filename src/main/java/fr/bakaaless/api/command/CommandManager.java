@@ -149,8 +149,8 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 }
             }
 
-            final String finalArg = argument.replace(toExec.getSecond().replace(" ", "\n"), "")
-                    .replaceFirst("[\n]", "");
+            final String finalArg = argument.replace(toExec.getSecond().replace(" ", "\n"), "");
+
 
             final List<String> arguments = (finalArg.equals("") ?
                     new ArrayList<>() :
