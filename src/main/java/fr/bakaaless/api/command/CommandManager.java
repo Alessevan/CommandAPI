@@ -43,10 +43,10 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             if (concatenateArgs.getFirst()) {
                 if (arg.endsWith("\"") && !arg.endsWith("\\\"") && concatenateArgs.getSecond().equalsIgnoreCase("\"")) {
                     concatenateArgs = Pair.from(false, "");
-                    builder.append(" ").append(arg, 0, arg.length() - 1).append(",");
+                    builder.append(" ").append(arg, 0, arg.length() - 1).append("\n");
                 } else if (arg.endsWith("'") && !arg.endsWith("\\'") && concatenateArgs.getSecond().equalsIgnoreCase("'")) {
                     concatenateArgs = Pair.from(false, "");
-                    builder.append(" ").append(arg, 0, arg.length() - 1).append(",");
+                    builder.append(" ").append(arg, 0, arg.length() - 1).append("\n");
                 } else
                     builder.append(" ").append(arg);
             } else {
@@ -57,7 +57,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                     concatenateArgs = Pair.from(true, "'");
                     builder.append(arg.substring(1));
                 } else
-                    builder.append(arg).append(",");
+                    builder.append(arg).append("\n");
 
             }
         }
@@ -65,7 +65,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         String argument = "";
         if (rawArgs.length() > 0) {
             rawArgs.deleteCharAt(0);
-            argument = (builder.charAt(builder.length() - 1) == ',' ? builder.deleteCharAt(builder.length() - 1).toString() : builder.toString());
+            argument = (builder.charAt(builder.length() - 1) == '\n' ? builder.deleteCharAt(builder.length() - 1).toString() : builder.toString()).replace("\\\"", "\"");
         }
 
         String containsCommand = "";
@@ -95,7 +95,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                         continue;
                     for (final String aliases : annotation.subCommand()) {
 
-                        if (!argument.toLowerCase().startsWith(aliases.replace(" ", ",").toLowerCase()))
+                        if (!argument.toLowerCase().startsWith(aliases.replace(" ", "\n").toLowerCase()))
                             continue;
 
                         if (isCommandInExec) {
@@ -149,12 +149,12 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 }
             }
 
-            final String finalArg = argument.replace(toExec.getSecond().replace(" ", ","), "")
-                    .replaceFirst("[,]", "");
+            final String finalArg = argument.replace(toExec.getSecond().replace(" ", "\n"), "")
+                    .replaceFirst("[\n]", "");
 
             final List<String> arguments = (finalArg.equals("") ?
                     new ArrayList<>() :
-                    new ArrayList<>(Arrays.asList(finalArg.split(",")))
+                    new ArrayList<>(Arrays.asList(finalArg.split("\n")))
             );
 
             if (arguments.size() >= argumentSize) {
