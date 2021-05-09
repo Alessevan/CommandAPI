@@ -72,7 +72,7 @@ public class Main extends JavaPlugin {
     @Override
     public void onEnable() {
         this.manager = new CommandManager(this);
-        this.manager.registerCommands(MaSuperbeCommande.class, MaSuperbeSousCommande.class);
+        this.manager.registerRunners(MaSuperbeCommande.class, MaSuperbeSousCommande.class);
     }
 }
 ```
