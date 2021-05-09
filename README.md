@@ -21,7 +21,7 @@ import org.bukkit.command.CommandSender;
 import java.util.Collections;
 
 @RunCommand(command = "maNouvelleCommande")
-public class MaSuperbeCommande extends CommandRunner {
+public class MaSuperbeCommande implements CommandRunner {
 
     @Override
     public boolean run(final CommandSender sender, final List<String> args) {
@@ -45,7 +45,7 @@ import org.bukkit.command.CommandSender;
 import java.util.ArrayList;
 
 @RunSubCommand(command = "maNouvelleCommande", subCommand = {"secret", "mystère"})
-public class MaSuperbeSousCommande extends CommandRunner {
+public class MaSuperbeSousCommande implements CommandRunner {
 
     @Override
     public boolean run(final CommandSender sender, final List<String> args) {
