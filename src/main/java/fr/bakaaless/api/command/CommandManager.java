@@ -117,18 +117,20 @@ public class CommandManager implements CommandExecutor, TabCompleter {
 
             if (isCommandInExec) {
                 final RunCommand annotation = getAnnotationCommand(toExec.getFirst());
+                assert annotation != null;
                 permission = annotation.permission();
                 executorType = annotation.executor();
                 argumentSize = annotation.arguments();
             }
             else {
                 final RunSubCommand annotation = getAnnotationSubCommand(toExec.getFirst());
+                assert annotation != null;
                 permission = annotation.permission();
                 executorType = annotation.executor();
                 argumentSize = annotation.arguments();
             }
 
-            if (!sender.hasPermission(permission)) {
+            if (!sender.hasPermission(permission) && !(permission.replace(" ", "").equals("") || permission.isEmpty())) {
                 sender.sendMessage(Messages.ERROR_COMMAND_PERMISSION.get());
                 return false;
             }
