@@ -193,12 +193,9 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     @Nullable
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
-
-        final StringBuilder rawArgs = new StringBuilder();
         final StringBuilder builder = new StringBuilder();
         Pair<Boolean, String> concatenateArgs = Pair.from(false, "");
         for (final String arg : args) {
-            rawArgs.append(" ").append(arg);
             if (concatenateArgs.getFirst()) {
                 if (arg.endsWith("\"") && !arg.endsWith("\\\"") && concatenateArgs.getSecond().equalsIgnoreCase("\"")) {
                     concatenateArgs = Pair.from(false, "");
@@ -221,11 +218,18 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             }
         }
 
-        String argument = "";
-        if (rawArgs.length() > 0) {
-            rawArgs.deleteCharAt(0);
-            argument = (builder.charAt(builder.length() - 1) == '\n' ? builder.deleteCharAt(builder.length() - 1).toString() : builder.toString()).replace("\\\"", "\"");
+        final String argument = (builder.charAt(builder.length() - 1) == '\n' ? builder.deleteCharAt(builder.length() - 1).toString() : builder.toString()).replace("\\\"", "\"");
+        final String[] tempArgs = argument.split("\n");
+
+        final StringBuilder toCheck = new StringBuilder();
+        for (int index = 0; index < tempArgs.length; index++) {
+            toCheck.append(tempArgs[index]);
+            if (index < tempArgs.length -1)
+                toCheck.append(",");
         }
+
+        if (tempArgs.length < 1)
+            return new ArrayList<>();
 
         String containsCommand = "";
         Pair<CommandRunner, String> toExec = null;
@@ -244,8 +248,11 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             }
         }
 
-        for (final Map.Entry<String, List<CommandRunner>> subCommands : this.subCommands.entrySet()) {
-            if (!containsCommand.isEmpty()) {
+        if (args[args.length - 1].isEmpty())
+            toCheck.append(",");
+
+        if (!containsCommand.isEmpty()) {
+            for (final Map.Entry<String, List<CommandRunner>> subCommands : this.subCommands.entrySet()) {
                 if (!subCommands.getKey().equalsIgnoreCase(containsCommand))
                     continue;
                 for (final CommandRunner executor : subCommands.getValue()) {
@@ -253,8 +260,8 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                     if (annotation == null)
                         continue;
                     for (final String aliases : annotation.subCommand()) {
-
-                        if (!argument.toLowerCase().startsWith(aliases.replace(" ", ",").toLowerCase()))
+                        final boolean condition = !toCheck.toString().toLowerCase().startsWith((aliases + " ").replace(" ", ",").toLowerCase());
+                        if (condition)
                             continue;
 
                         if (isCommandInExec) {
@@ -269,8 +276,9 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         }
 
         if (toExec != null) {
-            final String finalArg = argument.replace(toExec.getSecond().replace(" ", "\n"), "");
-
+            String finalArg = argument.replace(toExec.getSecond().replace(" ", "\n"), "");
+            if (finalArg.startsWith("\n"))
+                finalArg = finalArg.replaceFirst("\n", "");
 
             final List<String> arguments = (finalArg.equals("") ?
                     new ArrayList<>() :
@@ -410,7 +418,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                     }
                     basePluginCommand.unregister(map);
                     names.forEach(name ->
-                        commands.remove(name, basePluginCommand)
+                            commands.remove(name, basePluginCommand)
                     );
                 } catch (NoSuchFieldException | IllegalAccessException e) {
                     this.pluginInstance.getLogger().log(Level.SEVERE, Messages.ERROR_COMMAND_UNKNOWN.get(), e);
